@@ -1,9 +1,9 @@
 import IdentitySelector from "@/components/layout/identity/selector";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuItem } from "@/components/ui/sidebar";
 
-export async function AppSidebar() {
+export default async function AppSidebar() {
     return (
-        <Sidebar className="bg-slate-800">
+        <Sidebar>
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>

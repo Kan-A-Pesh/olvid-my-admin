@@ -2,8 +2,8 @@
 import { create } from "zustand";
 
 interface IdentityState {
-    identity: bigint | null;
-    setIdentity: (identity: bigint) => void;
+    identity: string | null;
+    setIdentity: (identity: string) => void;
 }
 
 const useIdentityStore = create<IdentityState>((set) => ({

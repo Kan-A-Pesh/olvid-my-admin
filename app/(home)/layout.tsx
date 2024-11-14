@@ -1,5 +1,5 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "./sidebar";
+import AppSidebar from "./sidebar";
 import Navbar from "./navbar";
 
 export default function HomeLayout({

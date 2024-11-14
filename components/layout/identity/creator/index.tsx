@@ -1,33 +1,36 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { formIdentityDetails, FormIdentityDetails } from "@/types/identity/details";
-import { Form, useForm } from "react-hook-form";
+import { formIdentityDetails, FormIdentityDetails } from "@/types/form/identity";
+import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { DialogHeader, DialogFooter, DialogTrigger, Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { DialogHeader, DialogFooter, Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import createIdentity from "./create-identity";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import getDefaults from "@/utils/get-defaults";
 
 interface IdentityCreatorProps {
-    trigger: React.ReactNode;
+    isOpen: boolean;
+    setIsOpen: (open: boolean) => void;
+    onSubmit: (data: FormIdentityDetails) => Promise<unknown> | unknown;
+    defaultValues?: FormIdentityDetails;
 }
 
-export function IdentityCreator({ trigger }: IdentityCreatorProps) {
+export function IdentityCreator({ isOpen, setIsOpen, onSubmit, defaultValues }: IdentityCreatorProps) {
     const form = useForm<FormIdentityDetails>({
         resolver: zodResolver(formIdentityDetails),
+        defaultValues: defaultValues || getDefaults(formIdentityDetails),
     });
 
     return (
-        <Dialog>
-            <DialogTrigger asChild>{trigger}</DialogTrigger>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogContent className="sm:max-w-[425px]">
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(createIdentity)} className="space-y-8">
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <DialogHeader>
                             <DialogTitle>Create identity</DialogTitle>
                             <DialogDescription>Create a new identity for your account</DialogDescription>
                         </DialogHeader>
-                        <div className="grid grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             <FormField
                                 control={form.control}
                                 name="firstName"
@@ -54,9 +57,7 @@ export function IdentityCreator({ trigger }: IdentityCreatorProps) {
                                     </FormItem>
                                 )}
                             />
-                        </div>
 
-                        <div className="grid grid-cols-2 gap-6">
                             <FormField
                                 control={form.control}
                                 name="position"
