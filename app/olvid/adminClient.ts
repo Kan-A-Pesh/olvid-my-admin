@@ -1,4 +1,4 @@
-"use server";
+import "server-only";
 
 import { OlvidAdminClient } from "@olvid/bot-node";
 
