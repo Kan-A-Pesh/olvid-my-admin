@@ -1,0 +1,9 @@
+services:
+  daemon:
+    image: olvid/bot-daemon
+    environment:
+      - OLVID_ADMIN_CLIENT_KEY_CLI=${OLVID_ADMIN_CLIENT_KEY}
+    ports:
+      - 50051:50051
+    volumes:
+      - ./data:/daemon/data
