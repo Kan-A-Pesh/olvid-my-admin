@@ -2,7 +2,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from "./sidebar";
 import Navbar from "./navbar";
 
-export default function HomeLayout({
+export default async function HomeLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;

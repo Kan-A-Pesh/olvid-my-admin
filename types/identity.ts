@@ -3,9 +3,9 @@ import { z } from "zod";
 
 export const formIdentityDetails = z.object({
     firstName: z.string().min(1).max(30).default(""),
-    lastName: z.string().min(1).max(30).optional(),
-    company: z.string().min(1).max(40).optional(),
-    position: z.string().min(1).max(40).optional(),
+    lastName: z.string().max(30).optional(),
+    company: z.string().max(40).optional(),
+    position: z.string().max(40).optional(),
 });
 
 export type FormIdentityDetails = z.infer<typeof formIdentityDetails>;
@@ -19,7 +19,7 @@ export type DataIdentity = {
     position?: string;
 };
 
-export const toDataIdentity = (identity: datatypes.Identity) => {
+export const toDataIdentity = (identity: datatypes.Identity): DataIdentity => {
     return {
         id: identity.id.toString(),
         displayName: identity.displayName,

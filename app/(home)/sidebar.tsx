@@ -1,21 +1,16 @@
-import IdentitySelector from "@/components/layout/identity/selector";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuItem } from "@/components/ui/sidebar";
+"use server";
+
+import IdentityNav from "@/components/layout/identity/nav-card";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from "@/components/ui/sidebar";
 
 export default async function AppSidebar() {
     return (
         <Sidebar>
-            <SidebarHeader>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <IdentitySelector />
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarHeader>
-            <SidebarContent>
-                <SidebarGroup />
-                <SidebarGroup />
-            </SidebarContent>
-            <SidebarFooter />
+            <SidebarHeader></SidebarHeader>
+            <SidebarContent></SidebarContent>
+            <SidebarFooter>
+                <IdentityNav />
+            </SidebarFooter>
         </Sidebar>
     );
 }

@@ -3,7 +3,7 @@ import { create } from "zustand";
 
 interface IdentityState {
     identity: string | null;
-    setIdentity: (identity: string) => void;
+    setIdentity: (identity: string | null) => void;
 }
 
 const useIdentityStore = create<IdentityState>((set) => ({

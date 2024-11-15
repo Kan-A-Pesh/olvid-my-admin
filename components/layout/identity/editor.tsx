@@ -1,6 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { formIdentityDetails, FormIdentityDetails } from "@/types/form/identity";
+import { formIdentityDetails, FormIdentityDetails } from "@/types/identity";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { DialogHeader, DialogFooter, Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
@@ -13,9 +13,14 @@ interface IdentityCreatorProps {
     setIsOpen: (open: boolean) => void;
     onSubmit: (data: FormIdentityDetails) => Promise<unknown> | unknown;
     defaultValues?: FormIdentityDetails;
+    content: {
+        title: string;
+        description: string;
+        submit: string;
+    };
 }
 
-export function IdentityCreator({ isOpen, setIsOpen, onSubmit, defaultValues }: IdentityCreatorProps) {
+export default function IdentityEditor({ isOpen, setIsOpen, onSubmit, defaultValues, content }: IdentityCreatorProps) {
     const form = useForm<FormIdentityDetails>({
         resolver: zodResolver(formIdentityDetails),
         defaultValues: defaultValues || getDefaults(formIdentityDetails),
@@ -27,8 +32,8 @@ export function IdentityCreator({ isOpen, setIsOpen, onSubmit, defaultValues }: 
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <DialogHeader>
-                            <DialogTitle>Create identity</DialogTitle>
-                            <DialogDescription>Create a new identity for your account</DialogDescription>
+                            <DialogTitle>{content.title}</DialogTitle>
+                            <DialogDescription>{content.description}</DialogDescription>
                         </DialogHeader>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             <FormField
@@ -87,7 +92,7 @@ export function IdentityCreator({ isOpen, setIsOpen, onSubmit, defaultValues }: 
                         </div>
 
                         <DialogFooter>
-                            <Button type="submit">Create</Button>
+                            <Button type="submit">{content.submit}</Button>
                         </DialogFooter>
                     </form>
                 </Form>
