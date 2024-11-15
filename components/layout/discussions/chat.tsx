@@ -1,25 +1,20 @@
 "use client";
 
 import listMessages from "@/lib/messages/list-messages";
-import useIdentityStore from "@/stores/identity";
 import { useQuery } from "@tanstack/react-query";
 import MessageContent from "./message-content";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface ChatProps {
+    identityId: string;
     discussionId: string;
 }
 
-export default function Chat({ discussionId }: ChatProps) {
-    const identityId = useIdentityStore((state) => state.identity);
-
+export default function Chat({ identityId, discussionId }: ChatProps) {
     const { data: messages } = useQuery({
         queryKey: ["messages", discussionId],
-        queryFn: () => listMessages(identityId as string, discussionId),
-        enabled: !!identityId,
+        queryFn: () => listMessages(identityId, discussionId),
     });
-
-    console.log(messages);
 
     return (
         <div className="flex-1 justify-end min-h-0 overflow-y-auto flex flex-col gap-2 p-4 pb-0">

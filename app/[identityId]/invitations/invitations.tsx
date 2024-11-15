@@ -1,27 +1,20 @@
 "use client";
 
-import useIdentityStore from "@/stores/identity";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DataInvitation } from "@/types/invitation";
 import InvitationsOngoingCard from "@/components/layout/invitation/ongoing-card";
 import listInvitations from "@/lib/invitations/list-invitations";
 import { Skeleton } from "@/components/ui/skeleton";
 import InvitationsReceivedCard from "@/components/layout/invitation/received-card";
-import manageInvitation from "@/lib/invitations/manage-invitation";
-import sasInvitation from "@/lib/invitations/sas-invitation";
-import { useToast } from "@/hooks/use-toast";
-import deleteInvitation from "@/lib/invitations/delete-invitation";
 import InvitationsSentCard from "@/components/layout/invitation/sent-card";
+import { useItemsQuery } from "@/hooks/use-item-query";
+import manageInvitationMutation from "@/hooks/mutations/invitations/manage";
+import deleteInvitationMutation from "@/hooks/mutations/invitations/delete";
+import sasInvitationMutation from "@/hooks/mutations/invitations/sas";
 
-export default function Invitations() {
-    const identityId = useIdentityStore((state) => state.identity);
-    const client = useQueryClient();
-    const toast = useToast();
-
-    const { isPending, data: invitations } = useQuery({
+export default function Invitations({ identityId }: { identityId: string }) {
+    const { isPending, data: invitations } = useItemsQuery({
         queryKey: ["invitations"],
-        queryFn: () => listInvitations(identityId as string),
-        enabled: !!identityId,
+        queryFn: () => listInvitations(identityId),
     });
 
     const { received, sent, ongoing, unknown } = Object.values(invitations || {}).reduce(
@@ -37,37 +30,9 @@ export default function Invitations() {
         },
     );
 
-    const manageMutation = useMutation({
-        mutationFn: async ({ invitationId, accepted }: { invitationId: string; accepted: boolean }) => {
-            return await manageInvitation(identityId as string, invitationId, accepted);
-        },
-        onSuccess: () => {
-            client.invalidateQueries({ queryKey: ["invitations"] });
-        },
-    });
-
-    const deleteMutation = useMutation({
-        mutationFn: async (invitationId: string) => {
-            return await deleteInvitation(identityId as string, invitationId);
-        },
-        onSuccess: () => {
-            client.invalidateQueries({ queryKey: ["invitations"] });
-        },
-    });
-
-    const sasMutation = useMutation({
-        mutationFn: async ({ invitationId, sas }: { invitationId: string; sas: string }) => {
-            return await sasInvitation(identityId as string, invitationId, sas);
-        },
-        onSuccess: () => {
-            client.invalidateQueries({ queryKey: ["invitations"] });
-            client.invalidateQueries({ queryKey: ["contacts"] });
-            toast.toast({
-                title: "Correct!",
-                description: "The SAS code is correct",
-            });
-        },
-    });
+    const manageInvitation = manageInvitationMutation(identityId);
+    const deleteInvitation = deleteInvitationMutation(identityId);
+    const sasInvitation = sasInvitationMutation(identityId);
 
     if (isPending) {
         return (
@@ -96,8 +61,8 @@ export default function Invitations() {
                             <InvitationsOngoingCard
                                 key={invitation.id}
                                 invitation={invitation}
-                                onSubmit={(sas) => sasMutation.mutate({ invitationId: invitation.id, sas })}
-                                onDelete={() => deleteMutation.mutate(invitation.id)}
+                                onSubmit={(sas) => sasInvitation.mutate({ invitationId: invitation.id, sas })}
+                                onDelete={() => deleteInvitation.mutate(invitation.id)}
                             />
                         ))}
                     </section>
@@ -114,8 +79,8 @@ export default function Invitations() {
                             <InvitationsReceivedCard
                                 key={invitation.id}
                                 invitation={invitation}
-                                onAccept={() => manageMutation.mutate({ invitationId: invitation.id, accepted: true })}
-                                onDecline={() => manageMutation.mutate({ invitationId: invitation.id, accepted: false })}
+                                onAccept={() => manageInvitation.mutate({ invitationId: invitation.id, accepted: true })}
+                                onDecline={() => manageInvitation.mutate({ invitationId: invitation.id, accepted: false })}
                             />
                         ))}
                     </section>
@@ -132,7 +97,7 @@ export default function Invitations() {
                             <InvitationsSentCard
                                 key={invitation.id}
                                 invitation={invitation}
-                                onDelete={() => deleteMutation.mutate(invitation.id)}
+                                onDelete={() => deleteInvitation.mutate(invitation.id)}
                             />
                         ))}
                     </section>

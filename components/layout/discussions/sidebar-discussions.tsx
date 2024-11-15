@@ -2,33 +2,22 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
 import listDiscussions from "@/lib/discussions/list-discussions";
-import useIdentityStore from "@/stores/identity";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import SidebarMenuGroup from "../sidebar/sidebar-menu-group";
 import { SidebarMenuButton } from "@/components/ui/sidebar";
-import createDiscussion from "@/lib/discussions/create-discussion";
-import { useRouter } from "next/navigation";
+import { useItemsQuery } from "@/hooks/use-item-query";
+import createDiscussionMutation from "@/hooks/mutations/discussions/create";
 
-export default function SidebarDiscussions() {
-    const identityId = useIdentityStore((state) => state.identity);
-    const client = useQueryClient();
-    const router = useRouter();
+interface SidebarDiscussionsProps {
+    identityId: string;
+}
 
-    const { data: discussions, isPending } = useQuery({
+export default function SidebarDiscussions({ identityId }: SidebarDiscussionsProps) {
+    const { data: discussions, isPending } = useItemsQuery({
         queryKey: ["discussions"],
-        queryFn: () => listDiscussions(identityId as string),
-        enabled: !!identityId,
+        queryFn: () => listDiscussions(identityId),
     });
 
-    const createMutation = useMutation({
-        mutationFn: async (discussionId: string) => {
-            return await createDiscussion(identityId as string, discussionId);
-        },
-        onSuccess: (discussion) => {
-            client.invalidateQueries({ queryKey: ["discussions"] });
-            router.push(`/discussions/${discussion.id}`);
-        },
-    });
+    const createDiscussion = createDiscussionMutation(identityId);
 
     if (isPending || !discussions) {
         return (
@@ -47,7 +36,7 @@ export default function SidebarDiscussions() {
             data={Object.values(discussions)}
             keyExtractor={(discussion) => discussion.id}
             item={(discussion) => (
-                <SidebarMenuButton asChild onClick={() => createMutation.mutate(discussion.id)}>
+                <SidebarMenuButton asChild onClick={() => createDiscussion.mutate(discussion.id)}>
                     <span className="truncate">{discussion.title}</span>
                 </SidebarMenuButton>
             )}

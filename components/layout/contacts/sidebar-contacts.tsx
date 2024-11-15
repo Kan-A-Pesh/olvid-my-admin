@@ -2,33 +2,25 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
 import listContacts from "@/lib/contacts/list-contacts";
-import useIdentityStore from "@/stores/identity";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import SidebarMenuGroup from "../sidebar/sidebar-menu-group";
 import { SidebarMenuButton } from "@/components/ui/sidebar";
 import createDiscussion from "@/lib/discussions/create-discussion";
 import { useRouter } from "next/navigation";
+import createDiscussionMutation from "@/hooks/mutations/discussions/create";
+import { useItemsQuery } from "@/hooks/use-item-query";
 
-export default function SidebarContacts() {
-    const identityId = useIdentityStore((state) => state.identity);
-    const client = useQueryClient();
-    const router = useRouter();
+interface SidebarContactsProps {
+    identityId: string;
+}
 
-    const { data: contacts, isPending } = useQuery({
+export default function SidebarContacts({ identityId }: SidebarContactsProps) {
+    const { data: contacts, isPending } = useItemsQuery({
         queryKey: ["contacts"],
         queryFn: () => listContacts(identityId as string),
-        enabled: !!identityId,
     });
 
-    const createMutation = useMutation({
-        mutationFn: async (contactId: string) => {
-            return await createDiscussion(identityId as string, contactId);
-        },
-        onSuccess: (discussion) => {
-            client.invalidateQueries({ queryKey: ["discussions"] });
-            router.push(`/discussions/${discussion.id}`);
-        },
-    });
+    const createDiscussion = createDiscussionMutation(identityId);
 
     if (isPending || !contacts) {
         return (
@@ -47,7 +39,7 @@ export default function SidebarContacts() {
             data={Object.values(contacts)}
             keyExtractor={(contact) => contact.id}
             item={(contact) => (
-                <SidebarMenuButton asChild onClick={() => createMutation.mutate(contact.id)}>
+                <SidebarMenuButton asChild onClick={() => createDiscussion.mutate(contact.id)}>
                     <span className="truncate">{contact.displayName}</span>
                 </SidebarMenuButton>
             )}

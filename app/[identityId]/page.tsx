@@ -1,4 +1,4 @@
-export default function Home() {
+export default async function HomePage() {
     return (
         <div className="flex-1 flex items-center justify-center flex-col gap-1 relative">
             <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold text-white/5 absolute">Olvid</h1>

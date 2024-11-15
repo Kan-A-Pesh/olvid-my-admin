@@ -1,22 +1,18 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import sendMessage from "@/lib/messages/send-message";
-import useIdentityStore from "@/stores/identity";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import sendMessageMutation from "@/hooks/mutations/messages/send";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Send } from "lucide-react";
 import { Markdown } from "tiptap-markdown";
 
 interface MessageBoxInputProps {
+    identityId: string;
     discussionId: string;
 }
 
-export default function MessageBoxInput({ discussionId }: MessageBoxInputProps) {
-    const identityId = useIdentityStore((state) => state.identity);
-    const client = useQueryClient();
-
+export default function MessageBoxInput({ identityId, discussionId }: MessageBoxInputProps) {
     const editor = useEditor({
         extensions: [
             StarterKit.configure({
@@ -29,17 +25,7 @@ export default function MessageBoxInput({ discussionId }: MessageBoxInputProps) 
         content: "",
     });
 
-    const sendMutation = useMutation({
-        mutationFn: async () => {
-            if (!editor || !identityId) return;
-            const content = editor.storage.markdown.getMarkdown();
-            return await sendMessage(identityId, discussionId, content);
-        },
-        onSuccess: () => {
-            editor?.commands.clearContent();
-            client.invalidateQueries({ queryKey: ["messages", discussionId] });
-        },
-    });
+    const sendMessage = sendMessageMutation(identityId, discussionId);
 
     return (
         <div className="flex p-4 gap-2 items-end">
@@ -47,10 +33,10 @@ export default function MessageBoxInput({ discussionId }: MessageBoxInputProps) 
                 <EditorContent
                     className="px-4 py-2 w-full outline-none border-none"
                     editor={editor}
-                    onKeyDown={(e) => e.key === "Enter" && sendMutation.mutate()}
+                    onKeyDown={(e) => e.key === "Enter" && sendMessage.mutate(editor)}
                 />
             </div>
-            <Button type="submit" onClick={() => sendMutation.mutate()} disabled={sendMutation.isPending}>
+            <Button type="submit" onClick={() => sendMessage.mutate(editor)} disabled={sendMessage.isPending}>
                 <Send />
                 Send
             </Button>

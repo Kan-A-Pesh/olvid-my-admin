@@ -2,18 +2,20 @@
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import listDiscussions from "@/lib/discussions/list-discussions";
-import useIdentityStore from "@/stores/identity";
 import { useQuery } from "@tanstack/react-query";
 import { CircleHelp, Home, MessageCircle, UserRoundPlus } from "lucide-react";
 import { usePathname } from "next/navigation";
 
-export default function Navbar() {
+interface NavbarProps {
+    identityId: string;
+}
+
+export default function Navbar({ identityId }: NavbarProps) {
     const pathname = usePathname();
 
-    const identityId = useIdentityStore((state) => state.identity);
     const { data: discussions, isPending } = useQuery({
         queryKey: ["discussions"],
-        queryFn: () => listDiscussions(identityId as string),
+        queryFn: () => listDiscussions(identityId),
         enabled: !!identityId && pathname.startsWith("/discussions/"),
     });
 

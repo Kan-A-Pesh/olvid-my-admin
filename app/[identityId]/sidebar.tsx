@@ -5,16 +5,20 @@ import SidebarDiscussions from "@/components/layout/discussions/sidebar-discussi
 import IdentityNav from "@/components/layout/identity/nav-card";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from "@/components/ui/sidebar";
 
-export default async function AppSidebar() {
+interface AppSidebarProps {
+    identityId: string;
+}
+
+export default async function AppSidebar({ identityId }: AppSidebarProps) {
     return (
         <Sidebar>
             <SidebarHeader></SidebarHeader>
             <SidebarContent>
-                <SidebarDiscussions />
-                <SidebarContacts />
+                <SidebarDiscussions identityId={identityId} />
+                <SidebarContacts identityId={identityId} />
             </SidebarContent>
             <SidebarFooter>
-                <IdentityNav />
+                <IdentityNav identityId={identityId} />
             </SidebarFooter>
         </Sidebar>
     );
