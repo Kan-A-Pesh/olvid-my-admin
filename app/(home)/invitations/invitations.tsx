@@ -61,7 +61,7 @@ export default function Invitations() {
         },
         onSuccess: () => {
             client.invalidateQueries({ queryKey: ["invitations"] });
-            client.invalidateQueries({ queryKey: ["conversations"] });
+            client.invalidateQueries({ queryKey: ["contacts"] });
             toast.toast({
                 title: "Correct!",
                 description: "The SAS code is correct",
